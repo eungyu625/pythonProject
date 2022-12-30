@@ -1,16 +1,17 @@
 dx = [-1, -1, 0, 1, 1, 1, 0, -1]
 dy = [0, -1, -1, -1, 0, 1, 1, 1]
 
-graph = [[] for _ in range(4)]
-answer = 0
+graph = [[[] for _ in range(4)] for _ in range(4)]
 
 for a in range(4):
     data = list(map(int, input().split()))
-    fishes =[]
+    fishes = []
     for b in range(4):
         ai, bi = data[2 * b], data[2 * b + 1] - 1
         fishes.append([ai, bi])
     graph[a] = fishes
+
+answer = 0
 
 
 def deepcopy(mutable):
@@ -22,7 +23,7 @@ def deepcopy(mutable):
     return now
 
 
-def solve(sx, sy, result, current):
+def move(sx, sy, result, current):
     global answer
     result += current[sx][sy][0]
     answer = max(result, answer)
@@ -47,13 +48,16 @@ def solve(sx, sy, result, current):
                     current[fx][fy], current[nx][ny] = current[nx][ny], current[fx][fy]
                     break
             di = (di + 1) % 8
+
     di = current[sx][sy][1]
     for k in range(1, 4):
         nx, ny = sx + dx[di] * k, sy + dy[di] * k
         if 0 <= nx < 4 and 0 <= ny < 4:
             if current[nx][ny][0] != 0:
-                solve(nx, ny, result, deepcopy(current))
+                move(nx, ny, result, deepcopy(current))
 
 
-solve(0, 0, 0, graph)
+move(0, 0, 0, graph)
 print(answer)
+
+
