@@ -29,29 +29,31 @@ def solve():
     new_data = [[0] * N for _ in range(N)]
     for i in range(N):
         for j in range(N):
-            if graph[i][j] != 0:
-                direction = directions[graph[i][j] - 1]
-                found = False
-                for index in priorities[graph[i][j] - 1][direction - 1]:
-                    nx, ny = i + dx[index - 1], j + dy[index - 1]
-                    if 0 <= nx < N and 0 <= ny < N:
-                        if smell[nx][ny][1] == 0:
-                            directions[graph[i][j] - 1] = index
-                            if new_data[nx][ny] == 0:
-                                new_data[nx][ny] = graph[i][j]
-                            else:
-                                new_data[nx][ny] = min(new_data[nx][ny], graph[i][j])
-                            found = True
-                            break
-                if found:
-                    continue
-                for index in priorities[graph[i][j] - 1][direction - 1]:
-                    nx, ny = i + dx[index - 1], j + dy[index - 1]
-                    if 0 <= nx < N and 0 <= ny < N:
-                        if smell[nx][ny][0] == graph[i][j]:
-                            directions[graph[i][j] - 1] = index
+            if graph[i][j] == 0:
+                continue
+            direction = directions[graph[i][j] - 1]
+            found = False
+            for index in priorities[graph[i][j] - 1][direction - 1]:
+                nx, ny = i + dx[index - 1], j + dy[index - 1]
+                if 0 <= nx < N and 0 <= ny < N:
+                    if smell[nx][ny][1] == 0:
+                        directions[graph[i][j] - 1] = index
+                        found = True
+                        if new_data[nx][ny] == 0:
                             new_data[nx][ny] = graph[i][j]
-                            break
+                        else:
+                            new_data[nx][ny] = min(new_data[nx][ny], graph[i][j])
+                        break
+            if found:
+                continue
+
+            for index in priorities[graph[i][j] - 1][direction - 1]:
+                nx, ny = i + dx[index - 1], j + dy[index - 1]
+                if 0 <= nx < N and 0 <= ny < N:
+                    if smell[nx][ny][0] == graph[i][j]:
+                        directions[graph[i][j] - 1] = index
+                        new_data[nx][ny] = graph[i][j]
+                        break
     return new_data
 
 
@@ -62,9 +64,9 @@ while True:
     answer += 1
 
     check = True
-    for a in range(N):
-        for b in range(N):
-            if graph[a][b] > 1:
+    for i in range(N):
+        for j in range(N):
+            if graph[i][j] > 1:
                 check = False
                 break
     if check:
