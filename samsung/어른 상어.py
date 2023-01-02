@@ -5,8 +5,8 @@ N, M, k = map(int, input().split())
 graph = [list(map(int, input().split())) for _ in range(N)]
 
 directions = list(map(int, input().split()))
-smell = [[[0, 0]] * N for _ in range(N)]
 priorities = []
+smell = [[[0, 0]] * N for _ in range(N)]
 
 for _ in range(M):
     temp = []
@@ -64,14 +64,14 @@ while True:
     answer += 1
 
     check = True
-    for i in range(N):
-        for j in range(N):
-            if graph[i][j] > 1:
+    for a in range(N):
+        for b in range(N):
+            if graph[a][b] > 1:
                 check = False
                 break
     if check:
         print(answer)
         break
     if answer >= 1000:
-        print(-1)
+        print(answer)
         break
