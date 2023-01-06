@@ -8,7 +8,7 @@ directions = list(map(int, input().split()))
 priorities = []
 smell = [[[0, 0]] * N for _ in range(N)]
 
-for _ in range(M):
+for a in range(M):
     temp = []
     for _ in range(4):
         data = list(map(int, input().split()))
@@ -46,7 +46,6 @@ def solve():
                         break
             if found:
                 continue
-
             for index in priorities[graph[i][j] - 1][direction - 1]:
                 nx, ny = i + dx[index - 1], j + dy[index - 1]
                 if 0 <= nx < N and 0 <= ny < N:
@@ -73,5 +72,6 @@ while True:
         print(answer)
         break
     if answer >= 1000:
-        print(answer)
+        print(-1)
         break
+
