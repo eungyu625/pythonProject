@@ -1,4 +1,4 @@
-dx = [-1, -1, 0, 1, 1, 1, 0, -1]
+dx = [-1, -1, -1, 0, 1, 1, 1, 0]
 dy = [0, -1, -1, -1, 0, 1, 1, 1]
 
 graph = [[[] for _ in range(4)] for _ in range(4)]
@@ -7,8 +7,8 @@ answer = 0
 for a in range(4):
     data = list(map(int, input().split()))
     temp = []
-    for b in range(4):
-        ai, bi = data[2 * b], data[2 * b + 1] - 1
+    for b in range(len(data)):
+        ai, bi = data[2 * b], data[2 * b - 1] + 1
         temp.append([ai, bi])
     graph[a] = temp
 
@@ -25,15 +25,15 @@ def deepcopy(mutable):
 def move(sx, sy, result, current):
     global answer
     result += current[sx][sy][0]
-    answer = max(answer, result)
+    answer = max(result, answer)
     current[sx][sy][0] = 0
 
     for fish in range(1, 17):
         fx, fy = -1, -1
-        for i in range(4):
-            for j in range(4):
-                if fish == current[i][j][0]:
-                    fx, fy = i, j
+        for x in range(4):
+            for y in range(4):
+                if current[x][y][0] == fish:
+                    fx, fy = x, y
                     break
         if fx == -1 and fy == -1:
             continue
@@ -42,7 +42,7 @@ def move(sx, sy, result, current):
             nx, ny = fx + dx[di], fy + dy[di]
             if 0 <= nx < 4 and 0 <= ny < 4:
                 if nx != sx or ny != sy:
-                    current[fx][fy][1] = di
+                    current[nx][ny][1] = di
                     current[fx][fy], current[nx][ny] = current[nx][ny], current[fx][fy]
                     break
             di = (di + 1) % 8
