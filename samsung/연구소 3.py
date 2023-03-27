@@ -1,59 +1,65 @@
-dx = [-1, 1, 0, 0]
-dy = [0, 0, -1, 1]
+dx = [0, -1, 1, 0]
+dy = [-1, 0, 0, 1]
 
 N, M = map(int, input().split())
-graph = []
+arr = []
 virus = []
 answer = int(1e9)
 
-for a in range(N):
+for d in range(N):
     data = list(map(int, input().split()))
-    graph.append(data)
-    for b in range(len(data)):
-        if data[b] == 2:
-            virus.append([a, b])
+    arr.append(data)
+    for v in range(len(data)):
+        if data[v] == 2:
+            virus.append([d, v])
 
 
-def solve(temp):
-    current = [[-1] * N for _ in range(N)]
+def check(current):
+    for i in range(N):
+        for j in range(N):
+            if current[i][j] == -1 and arr[i][j] == 0:
+                return False
+    return True
+
+
+def solve(current):
+    global answer
+    temp = [[-1] * N for _ in range(N)]
     queue = []
-    for tx, ty in temp:
-        current[tx][ty] = 0
-        queue.append([tx, ty])
-
+    for i, j in current:
+        temp[i][j] = 0
+        queue.append([i, j])
     while queue:
         x, y = queue.pop(0)
         for k in range(4):
-            nx = x + dx[k]
-            ny = y + dy[k]
+            nx, ny = x + dx[k], y + dy[k]
             if 0 <= nx < N and 0 <= ny < N:
-                if graph[nx][ny] != 1 and current[nx][ny] == -1:
-                    current[nx][ny] = current[x][y] + 1
+                if arr[nx][ny] != 1 and temp[nx][ny] == -1:
+                    temp[nx][ny] = temp[x][y] + 1
                     queue.append([nx, ny])
-
+    if not check(temp):
+        return
+    for i in range(N):
+        for j in range(N):
+            if arr[i][j] == 2 and temp[i][j] != 0:
+                temp[i][j] = -2
     result = 0
     for i in range(N):
         for j in range(N):
-            if graph[i][j] == 0:
-                if current[i][j] == -1:
-                    return int(1e9)
-                result = max(result, current[i][j])
-
-    return result
+            result = max(result, temp[i][j])
+    answer = min(answer, result)
+    return
 
 
-def choose(cnt, start, temp):
-    global answer
-    if cnt == M:
-        answer = min(answer, solve(temp))
+def choose(index, start, temp):
+    if index == M:
+        solve(temp)
         return
-
-    for i in range(start, len(virus)):
-        temp.append(virus[i])
-        choose(cnt + 1, i + 1, temp)
+    for idx in range(start, len(virus)):
+        temp.append(virus[idx])
+        choose(index + 1, idx + 1, temp)
         temp.pop()
 
 
 choose(0, 0, [])
-
-print(answer if answer != int(1e9) else -1)
+print(answer) if answer < int(1e9) else print(-1)
