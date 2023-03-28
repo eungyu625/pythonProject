@@ -1,60 +1,57 @@
-dx = [0, 0, -1, 1]
-dy = [-1, 1, 0, 0]
+dx = [-1, 1, 0, 0]
+dy = [0, 0, -1, 1]
 
 N = int(input())
-graph = []
-sx, sy = 0, 0
-shark_size = 2
-shark_num = 0
-time = 0
-prey = []
+arr = []
+shark = []
+size = 2
+number = 0
 
-for i in range(N):
+for a in range(N):
     data = list(map(int, input().split()))
-    graph.append(data)
-    for j in range(N):
-        if data[j] == 9:
-            sx, sy = i, j
-        elif data[j] != 0:
-            prey.append([i, j])
+    arr.append(data)
+    for b in range(len(data)):
+        if data[b] == 9:
+            shark = [a, b]
 
-while prey:
-    current = []
-    for x, y in prey:
-        if graph[x][y] < shark_size:
-            current.append([x, y])
-    if not current:
-        break
+answer = 0
+while True:
+    if number == size:
+        number = 0
+        size += 1
     temp = [[-1] * N for _ in range(N)]
-    temp[sx][sy] = 0
-    queue = [[sx, sy]]
+    temp[shark[0]][shark[1]] = 0
+    queue = [[shark[0], shark[1]]]
+
     while queue:
         x, y = queue.pop(0)
         for k in range(4):
             nx, ny = x + dx[k], y + dy[k]
             if 0 <= nx < N and 0 <= ny < N:
-                if graph[nx][ny] > shark_size:
-                    continue
-                if temp[nx][ny] == -1:
+                if arr[nx][ny] <= size and temp[nx][ny] == -1:
                     temp[nx][ny] = temp[x][y] + 1
                     queue.append([nx, ny])
 
-    eat = []
-    for x, y in current:
-        if temp[x][y] > 0:
-            eat.append([x, y, temp[x][y]])
-    if not eat:
+    prey = []
+    for i in range(N):
+        for j in range(N):
+            if 0 < temp[i][j] and 0 < arr[i][j] < size:
+                prey.append([i, j, temp[i][j]])
+    if len(prey) == 0:
         break
-    eat.sort(key=lambda l: (l[-1], l[0], l[1]))
-    px, py, p_dist = eat[0]
-    prey.remove([px, py])
-    graph[sx][sy] = 0
-    graph[px][py] = 9
-    sx, sy = px, py
-    time += p_dist
-    shark_num += 1
-    if shark_num == shark_size:
-        shark_size += 1
-        shark_num = 0
+    elif len(prey) == 1:
+        answer += prey[0][2]
+        arr[shark[0]][shark[1]] = 0
+        shark = [prey[0][0], prey[0][1]]
+        arr[prey[0][0]][prey[0][1]] = 9
+        number += 1
+        continue
 
-print(time)
+    prey.sort(key=lambda l: (l[-1], l[0], l[1]))
+    answer += prey[0][2]
+    arr[shark[0]][shark[1]] = 0
+    shark = [prey[0][0], prey[0][1]]
+    arr[prey[0][0]][prey[0][1]] = 9
+    number += 1
+
+print(answer)
