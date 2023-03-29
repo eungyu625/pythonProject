@@ -2,33 +2,33 @@ dx = [-1, 0, 1, 0]
 dy = [0, -1, 0, 1]
 
 N, M, fuel = map(int, input().split())
-graph = [list(map(int, input().split())) for _ in range(N)]
+arr = [list(map(int, input().split())) for _ in range(N)]
 tx, ty = map(int, input().split())
 taxi = [tx - 1, ty - 1]
 start, end = [], []
-
 for _ in range(M):
     sx, sy, ex, ey = map(int, input().split())
-    start.append([sx, sy])
-    end.append([ex, ey])
+    start.append([sx - 1, sy - 1])
+    end.append([ex - 1, ey - 1])
 
 
-def move_to_passenger():
+def take_on_passenger():
     dist = [[-1] * N for _ in range(N)]
-    queue = [taxi]
-    dist[taxi[0]][taxi[1]] = 0
-    min_dist = int(1e9)
     candidate = []
+    dist[taxi[0]][taxi[1]] = 0
+    queue = [[taxi[0], taxi[1]]]
+    min_dist = int(1e9)
     while queue:
         x, y = queue.pop(0)
         if dist[x][y] > min_dist:
             break
-        if [x, y] in candidate:
+        if [x, y] in start:
             candidate.append([x, y])
+            min_dist = dist[x][y]
         for k in range(4):
             nx, ny = x + dx[k], y + dy[k]
             if 0 <= nx < N and 0 <= ny < N:
-                if graph[nx][ny] == 0 and dist[nx][ny] == -1:
+                if dist[nx][ny] == -1 and arr[nx][ny] == 0:
                     dist[nx][ny] = dist[x][y] + 1
                     queue.append([nx, ny])
     if not candidate:
@@ -37,10 +37,10 @@ def move_to_passenger():
     return candidate[0][0], candidate[0][1], dist[candidate[0][0]][candidate[0][1]]
 
 
-def move_to_destination(end_x, end_y):
+def go_to_destination(end_x, end_y):
     dist = [[-1] * N for _ in range(N)]
-    queue = [taxi]
     dist[taxi[0]][taxi[1]] = 0
+    queue = [[taxi[0], taxi[1]]]
     while queue:
         x, y = queue.pop(0)
         if x == end_x and y == end_y:
@@ -48,27 +48,26 @@ def move_to_destination(end_x, end_y):
         for k in range(4):
             nx, ny = x + dx[k], y + dy[k]
             if 0 <= nx < N and 0 <= ny < N:
-                if graph[nx][ny] == 0 and dist[nx][ny] == -1:
+                if dist[nx][ny] == -1 and arr[nx][ny] == 0:
                     dist[nx][ny] = dist[x][y] + 1
                     queue.append([nx, ny])
     return dist[end_x][end_y]
 
 
 for _ in range(M):
-    sx, sy, start_dist = move_to_passenger()
-    if start_dist == -1 or start_dist > fuel:
+    sx, sy, sdist = take_on_passenger()
+    if sdist > fuel or sdist == -1:
         fuel = -1
         break
-    fuel -= start_dist
+    fuel -= sdist
     taxi = [sx, sy]
     index = start.index([sx, sy])
     start[index] = [-1, -1]
-    ex, ey = end[index]
-    end_dist = move_to_destination(ex, ey)
-    if end_dist == -1 or end_dist > fuel:
+    edist = go_to_destination(end[index][0], end[index][1])
+    if edist > fuel or edist == -1:
         fuel = -1
         break
-    fuel += end_dist
-    taxi = [ex, ey]
+    taxi = [end[index][0], end[index][1]]
+    fuel += edist
 
 print(fuel)
