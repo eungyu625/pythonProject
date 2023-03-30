@@ -1,64 +1,61 @@
-dx = [0, 0, -1, 1]
-dy = [-1, 1, 0, 0]
+dx = [-1, 0, 1, 0]
+dy = [0, -1, 0, 1]
 
-n, m = map(int, input().split())
-graph = []
+N, M = map(int, input().split())
+arr = []
 virus = []
+answer = 0
 
-for i in range(n):
+for a in range(N):
     data = list(map(int, input().split()))
-    graph.append(data)
-    for j in range(len(data)):
-        if data[j] == 2:
-            virus.append([i, j])
-
-ans = -1
+    arr.append(data)
+    for b in range(len(data)):
+        if data[b] == 2:
+            virus.append([a, b])
 
 
-def default(temp):
-    curr = [[0] * m for _ in range(n)]
-    for x in range(n):
-        for y in range(m):
-            curr[x][y] = temp[x][y]
-    return curr
+def deepcopy(mutable):
+    if type(mutable) != list:
+        return mutable
+    now = []
+    for item in mutable:
+        now.append(deepcopy(item))
+    return now
 
 
-def solve(current):
-    result = default(current)
+def solve(temp):
+    global answer
+    current = deepcopy(temp)
     queue = []
-    for v in virus:
-        queue.append(v)
-
+    for x, y in virus:
+        queue.append([x, y])
     while queue:
         x, y = queue.pop(0)
         for k in range(4):
             nx, ny = x + dx[k], y + dy[k]
-            if 0 <= nx < n and 0 <= ny < m:
-                if result[nx][ny] == 0:
-                    result[nx][ny] = 2
+            if 0 <= nx < N and 0 <= ny < M:
+                if current[nx][ny] == 0:
+                    current[nx][ny] = 2
                     queue.append([nx, ny])
-    res = 0
-    for x in range(n):
-        for y in range(m):
-            if result[x][y] == 0:
-                res += 1
+    result = 0
+    for i in range(N):
+        for j in range(M):
+            if current[i][j] == 0:
+                result += 1
+    answer = max(answer, result)
 
-    return res
 
-
-def build(cnt, current):
-    global ans
-    if cnt == 3:
-        ans = max(ans, solve(current))
+def new_wall(index, temp):
+    if index == 3:
+        solve(temp)
         return
+    for i in range(N):
+        for j in range(M):
+            if temp[i][j] == 0:
+                temp[i][j] = 1
+                new_wall(index + 1, temp)
+                temp[i][j] = 0
 
-    for x in range(n):
-        for y in range(m):
-            if current[x][y] == 0:
-                current[x][y] = 1
-                build(cnt + 1, current)
-                current[x][y] = 0
 
-
-build(0, graph)
-print(ans)
+new_wall(0, arr)
+print(answer)
