@@ -1,33 +1,46 @@
-from itertools import permutations
-
 N = int(input())
-result = [list(map(int, input().split())) for _ in range(N)]
-orders = list(permutations([1, 2, 3, 4, 5, 6, 7, 8], 8))
+inning = [list(map(int, input().split())) for _ in range(N)]
 answer = 0
 
-for order in orders:
-    lineup = list(order[:3]) + [0] + list(order[3:])
-    score, hitter = 0, 0
-    for inning in range(N):
-        out = 0
+
+def solve(lineup):
+    global answer
+    lineup = list(lineup[:3]) + [0] + list(lineup[3:])
+    result, player = 0, 0
+    for n in range(N):
         base_1, base_2, base_3 = 0, 0, 0
-        while out != 3:
-            now = result[inning][lineup[hitter]]
+        out = 0
+        while out < 3:
+            now = inning[n][lineup[player]]
+            player = (player + 1) % 9
             if now == 0:
                 out += 1
             elif now == 1:
-                score += base_3
+                result += base_3
                 base_1, base_2, base_3 = 1, base_1, base_2
             elif now == 2:
-                score += base_2 + base_3
+                result += base_2 + base_3
                 base_1, base_2, base_3 = 0, 1, base_1
             elif now == 3:
-                score += base_1 + base_2 + base_3
+                result += base_1 + base_2 + base_3
                 base_1, base_2, base_3 = 0, 0, 1
-            elif now == 4:
-                score += 1 + base_1 + base_2 + base_3
+            else:
+                result += 1 + base_1 + base_2 + base_3
                 base_1, base_2, base_3 = 0, 0, 0
-            hitter = (hitter + 1) % 9
-    answer = max(answer, score)
+    answer = max(answer, result)
 
+
+def permutation(index, temp):
+    if index == 8:
+        solve(temp)
+        return
+    for i in range(1, 9):
+        if i in temp:
+            continue
+        temp.append(i)
+        permutation(index + 1, temp)
+        temp.pop()
+
+
+permutation(0, [])
 print(answer)
