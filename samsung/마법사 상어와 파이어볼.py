@@ -5,50 +5,45 @@ N, M, K = map(int, input().split())
 fireball = []
 
 for _ in range(M):
-    ri, ci, mi, si, di = map(int, input().split())
-    fireball.append([ri - 1, ci - 1, mi, si, di])
-
+    r, c, m, s, d = map(int, input().split())
+    fireball.append([r - 1, c - 1, m, s, d])
 
 for _ in range(K):
-    current = [[[] for _ in range(N)] for _ in range(N)]
-    length = len(fireball)
-
-    for _ in range(length):
-        r, c, m, s, d = fireball.pop(0)
-        nr = (r + dx[d] * s) % N
-        nc = (c + dy[d] * s) % N
-        current[nr][nc].append([m, s, d])
+    arr = [[[] for _ in range(N)] for _ in range(N)]
+    while fireball:
+        r, c, m, s, d = fireball.pop()
+        nr, nc = (r + dx[d] * s) % N, (c + dy[d] * s) % N
+        arr[nr][nc].append([m, s, d])
 
     for i in range(N):
         for j in range(N):
-            number = len(current[i][j])
-            if number == 1:
-                m, s, d = current[i][j][0]
+            if len(arr[i][j]) == 0:
+                continue
+            if len(arr[i][j]) == 1:
+                m, s, d = arr[i][j].pop()
                 fireball.append([i, j, m, s, d])
-            elif number > 1:
-                check = True
-                sum_m, sum_s, nd = current[i][j][0]
-                for k in range(1, number):
-                    m, s, d = current[i][j][k]
-                    sum_m += m
-                    sum_s += s
-                    if nd % 2 != d % 2:
-                        check = False
-                sum_m //= 5
-                if sum_m > 0:
-                    sum_s //= number
-                    if check:
-                        fireball.append([i, j, sum_m, sum_s, 0])
-                        fireball.append([i, j, sum_m, sum_s, 2])
-                        fireball.append([i, j, sum_m, sum_s, 4])
-                        fireball.append([i, j, sum_m, sum_s, 6])
-                    else:
-                        fireball.append([i, j, sum_m, sum_s, 1])
-                        fireball.append([i, j, sum_m, sum_s, 3])
-                        fireball.append([i, j, sum_m, sum_s, 5])
-                        fireball.append([i, j, sum_m, sum_s, 7])
-answer = 0
-for r, c, m, s, d in fireball:
-    answer += m
+                continue
+            mass, speed, even, odd, length = 0, 0, 0, 0, len(arr[i][j])
+            for m, s, d in arr[i][j]:
+                mass += m
+                speed += s
+                if d % 2 == 0:
+                    even += 1
+                else:
+                    odd += 1
+            mass //= 5
+            speed //= length
+            if mass == 0:
+                continue
+            if even == length or odd == length:
+                fireball.append([i, j, mass, speed, 0])
+                fireball.append([i, j, mass, speed, 2])
+                fireball.append([i, j, mass, speed, 4])
+                fireball.append([i, j, mass, speed, 6])
+            else:
+                fireball.append([i, j, mass, speed, 1])
+                fireball.append([i, j, mass, speed, 3])
+                fireball.append([i, j, mass, speed, 5])
+                fireball.append([i, j, mass, speed, 7])
 
-print(answer)
+print(sum(f[2] for f in fireball))
